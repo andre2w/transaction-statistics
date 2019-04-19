@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 @WebAppConfiguration
-public class AT_TransactionPost {
+public class AT_TransactionStatistics {
 
     private static final ZonedDateTime ZONED_DATE_TIME_NOW = ZonedDateTime.now(ZoneId.of("UTC"));
 
@@ -47,7 +47,7 @@ public class AT_TransactionPost {
     public void return_201_when_for_successful_POST_transactions() throws Exception {
         mockMvc.perform(post("/transactions")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(transactionJson(NOW)))
+                .content(transactionJson("12.3343",NOW)))
                 .andExpect(status().is(HttpStatus.CREATED.value()));
     }
 
@@ -55,14 +55,34 @@ public class AT_TransactionPost {
     public void return_204_case_transaction_is_older_than_60_seconds() throws Exception {
         mockMvc.perform(post("/transactions")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(transactionJson(TWO_MINUTES_AGO)))
+                .content(transactionJson("12.3343", TWO_MINUTES_AGO)))
                 .andExpect(status().is(HttpStatus.NO_CONTENT.value()));
     }
 
-    private String transactionJson(String timeStamp) {
+    @Test
+    public void return_400_case_json_is_invalid() throws Exception {
+        mockMvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(transactionJson("", NOW)))
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @Test
+    public void return_400_for_malformed_json() throws Exception {
+        mockMvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(malformedJson()))
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+    }
+
+    private String malformedJson() {
+        return "{json}";
+    }
+
+    private String transactionJson(String amount, String timeStamp) {
         //language=JSON
         return "{\n" +
-                "  \"amount\": \"12.3343\",\n" +
+                "  \"amount\": \""+ amount +"\",\n" +
                 "  \"timestamp\": \"" + timeStamp + "\"\n" +
                 "}";
     }

@@ -20,6 +20,10 @@ class TransactionController {
     @PostMapping
     ResponseEntity create(@RequestBody Transaction transaction) {
 
+        if (transaction.hasNullField()) {
+            return ResponseEntity.status(400).build();
+        }
+
         try {
             addTransaction.execute(transaction);
         } catch (InvalidTransactionTimestamp err) {
@@ -28,4 +32,5 @@ class TransactionController {
 
         return ResponseEntity.status(201).build();
     }
+
 }
