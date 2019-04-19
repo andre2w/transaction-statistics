@@ -42,7 +42,6 @@ class TransactionController {
     @DeleteMapping
     public ResponseEntity delete() {
         deleteStatistics.execute();
-
         return buildResponse(NO_CONTENT);
     }
 
