@@ -51,4 +51,17 @@ public class TransactionAggregatorShould {
         assertEquals(TRANSACTION_STATISTICS, result);
     }
 
+    @Test
+    public void skip_transactions_from_time_before() {
+        given(clock.now()).willReturn(NOW);
+        TransactionStatistics transactionStatistics =
+                new TransactionStatistics(new BigDecimal("100.00"), new BigDecimal("100.00"), new BigDecimal("100.00"), new BigDecimal("100.00"), 1);
+        Transaction transactionTenSecondsAgo = new Transaction(new BigDecimal("50.00"), NOW.minusSeconds(10));
+        transactionAggregator.add(FIRST_TRANSACTION);
+        transactionAggregator.add(transactionTenSecondsAgo);
+
+        TransactionStatistics result = transactionAggregator.statisticsOfLast(5);
+
+        assertEquals(transactionStatistics, result);
+    }
 }
