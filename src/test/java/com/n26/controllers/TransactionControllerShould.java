@@ -1,9 +1,6 @@
 package com.n26.controllers;
 
-import com.n26.transaction.AddTransaction;
-import com.n26.transaction.InvalidTransactionTimestamp;
-import com.n26.transaction.Transaction;
-import com.n26.transaction.TransactionInTheFutureException;
+import com.n26.transaction.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
@@ -28,11 +25,13 @@ public class TransactionControllerShould {
     private static final int UNPROCESSABLE_ENTITY = 422;
     private TransactionController transactionController;
     private AddTransaction addTransaction;
+    private DeleteStatistics deleteStatistics;
 
     @Before
     public void setUp() {
         addTransaction = mock(AddTransaction.class);
-        transactionController = new TransactionController(addTransaction);
+        deleteStatistics = mock(DeleteStatistics.class);
+        transactionController = new TransactionController(addTransaction, deleteStatistics);
     }
 
     @Test
@@ -72,5 +71,13 @@ public class TransactionControllerShould {
         ResponseEntity result = transactionController.create(transaction);
 
         assertEquals(ResponseEntity.status(UNPROCESSABLE_ENTITY).build(), result);
+    }
+
+    @Test
+    public void delete_stored_transaction_statistics() {
+        ResponseEntity result = transactionController.delete();
+
+        verify(deleteStatistics).execute();
+        assertEquals(ResponseEntity.status(NO_CONTENT).build(), result);
     }
 }

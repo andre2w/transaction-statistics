@@ -17,10 +17,10 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -54,7 +54,7 @@ public class AT_TransactionStatistics {
         mockMvc.perform(post("/transactions")
                 .contentType(APPLICATION_JSON)
                 .content(transactionJson("12.3343",NOW)))
-                .andExpect(status().is(HttpStatus.CREATED.value()));
+                .andExpect(status().is(CREATED.value()));
     }
 
     @Test
@@ -62,7 +62,7 @@ public class AT_TransactionStatistics {
         mockMvc.perform(post("/transactions")
                 .contentType(APPLICATION_JSON)
                 .content(transactionJson("12.3343", TWO_MINUTES_AGO)))
-                .andExpect(status().is(HttpStatus.NO_CONTENT.value()));
+                .andExpect(status().is(NO_CONTENT.value()));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class AT_TransactionStatistics {
         mockMvc.perform(post("/transactions")
                 .contentType(APPLICATION_JSON)
                 .content(transactionJson("", NOW)))
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+                .andExpect(status().is(BAD_REQUEST.value()));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class AT_TransactionStatistics {
         mockMvc.perform(post("/transactions")
                 .contentType(APPLICATION_JSON)
                 .content(malformedJson()))
-                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+                .andExpect(status().is(BAD_REQUEST.value()));
     }
 
     @Test
@@ -86,7 +86,7 @@ public class AT_TransactionStatistics {
         mockMvc.perform(post("/transactions")
                 .contentType(APPLICATION_JSON)
                 .content(transactionJson("12.3343", TOMORROW)))
-                .andExpect(status().is(HttpStatus.UNPROCESSABLE_ENTITY.value()));
+                .andExpect(status().is(UNPROCESSABLE_ENTITY.value()));
     }
 
     @Test
@@ -106,6 +106,17 @@ public class AT_TransactionStatistics {
                 .andExpect(jsonPath("$.max", is(100.00)))
                 .andExpect(jsonPath("$.min", is(50.00)))
                 .andExpect(jsonPath("$.count", is(2)));
+    }
+
+    @Test
+    public void delete_all_transactions() throws Exception {
+        mockMvc.perform(delete("/transactions"))
+                .andExpect(status().is(NO_CONTENT.value()));
+
+        mockMvc.perform(get("/statistics"))
+                .andExpect(jsonPath("$.sum", is(0.00)))
+                .andExpect(jsonPath("$.avg", is(0.00)))
+                .andExpect(jsonPath("$.count", is(0)));
     }
 
     private String malformedJson() {
