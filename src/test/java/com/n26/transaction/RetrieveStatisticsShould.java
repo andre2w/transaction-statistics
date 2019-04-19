@@ -4,9 +4,9 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class RetrieveStatisticsShould {
 
@@ -15,7 +15,7 @@ public class RetrieveStatisticsShould {
         TransactionStatistics transactionStatistics =
                 new TransactionStatistics(new BigDecimal("150.00"), new BigDecimal("75.00"), new BigDecimal("100.00"), new BigDecimal("50.00"), 2);
         TransactionAggregator transactionAggregator = mock(TransactionAggregator.class);
-        when(transactionAggregator.statisticsOfLast(60)).thenReturn(transactionStatistics);
+        given(transactionAggregator.statisticsOfLast(60)).willReturn(transactionStatistics);
 
         TransactionStatistics result = new RetrieveStatistics(transactionAggregator).retrieve();
 

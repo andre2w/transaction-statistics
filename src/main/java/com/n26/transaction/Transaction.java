@@ -19,4 +19,12 @@ public class Transaction {
     public boolean hasNullField() {
         return amount == null || timestamp == null;
     }
+
+    public Long epochSeconds() {
+        return timestamp.toEpochSecond();
+    }
+
+    public BigDecimal amount() {
+        return amount;
+    }
 }
