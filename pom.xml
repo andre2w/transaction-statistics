@@ -87,7 +87,36 @@
                             </resources>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>add-unit-test-sources</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M3</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Should.java</include>
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/AT*.java</exclude>
+                        <exclude>**/HttpJsonIT.java</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
 
         </plugins>
