@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -25,7 +26,14 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @WebAppConfiguration
 public class AT_TransactionPost {
 
-    public static final String NOW = ZonedDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"));
+    private static final ZonedDateTime ZONED_DATE_TIME_NOW = ZonedDateTime.now(ZoneId.of("UTC"));
+
+    private static final String NOW =
+        ZONED_DATE_TIME_NOW.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"));
+
+    private static final String TWO_MINUTES_AGO =
+        ZONED_DATE_TIME_NOW.minusMinutes(2).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"));
+
     @Autowired
     private GenericWebApplicationContext webApplicationContext;
     private MockMvc mockMvc;
@@ -39,16 +47,23 @@ public class AT_TransactionPost {
     public void return_201_when_for_successful_POST_transactions() throws Exception {
         mockMvc.perform(post("/transactions")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(transactionJson()))
-                .andExpect(status().is(201));
-
+                .content(transactionJson(NOW)))
+                .andExpect(status().is(HttpStatus.CREATED.value()));
     }
 
-    private String transactionJson() {
+    @Test
+    public void return_204_case_transaction_is_older_than_60_seconds() throws Exception {
+        mockMvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(transactionJson(TWO_MINUTES_AGO)))
+                .andExpect(status().is(HttpStatus.NO_CONTENT.value()));
+    }
+
+    private String transactionJson(String timeStamp) {
         //language=JSON
         return "{\n" +
                 "  \"amount\": \"12.3343\",\n" +
-                "  \"timestamp\": \"" + NOW + "\"\n" +
+                "  \"timestamp\": \"" + timeStamp + "\"\n" +
                 "}";
     }
 }

@@ -1,6 +1,7 @@
 package com.n26.controllers;
 
 import com.n26.transaction.AddTransaction;
+import com.n26.transaction.InvalidTransactionTimestamp;
 import com.n26.transaction.Transaction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,13 @@ class TransactionController {
 
     @PostMapping
     ResponseEntity create(@RequestBody Transaction transaction) {
-        addTransaction.execute(transaction);
+
+        try {
+            addTransaction.execute(transaction);
+        } catch (InvalidTransactionTimestamp err) {
+            return ResponseEntity.status(204).build();
+        }
+
         return ResponseEntity.status(201).build();
     }
 }
