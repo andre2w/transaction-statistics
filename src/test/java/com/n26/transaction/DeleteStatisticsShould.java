@@ -14,6 +14,6 @@ public class DeleteStatisticsShould {
 
         deleteStatistics.execute();
 
-        verify(transactionAggregator).clean();
+        verify(transactionAggregator).clear();
     }
 }

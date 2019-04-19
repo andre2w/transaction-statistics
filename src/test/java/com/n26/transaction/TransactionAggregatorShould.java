@@ -64,4 +64,15 @@ public class TransactionAggregatorShould {
 
         assertEquals(transactionStatistics, result);
     }
+
+    @Test
+    public void clean_stored_transaction_statistics() {
+        given(clock.now()).willReturn(NOW);
+        transactionAggregator.add(FIRST_TRANSACTION);
+        transactionAggregator.add(SECOND_TRANSACTION);
+
+        transactionAggregator.clear();
+
+        assertEquals(TransactionStatistics.empty(), transactionAggregator.statisticsOfLast(60));
+    }
 }

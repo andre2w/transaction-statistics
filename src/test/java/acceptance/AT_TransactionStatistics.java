@@ -39,6 +39,8 @@ public class AT_TransactionStatistics {
 
     private static final String TOMORROW =
         ZONED_DATE_TIME_NOW.plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"));
+    public static final String TRANSACTIONS_ENDPOINT = "/transactions";
+    public static final String STATISTICS_ENDPOINT = "/statistics";
 
     @Autowired
     private GenericWebApplicationContext webApplicationContext;
@@ -51,7 +53,7 @@ public class AT_TransactionStatistics {
 
     @Test
     public void return_201_when_for_successful_POST_transactions() throws Exception {
-        mockMvc.perform(post("/transactions")
+        mockMvc.perform(post(TRANSACTIONS_ENDPOINT)
                 .contentType(APPLICATION_JSON)
                 .content(transactionJson("12.3343",NOW)))
                 .andExpect(status().is(CREATED.value()));
@@ -59,7 +61,7 @@ public class AT_TransactionStatistics {
 
     @Test
     public void return_204_case_transaction_is_older_than_60_seconds() throws Exception {
-        mockMvc.perform(post("/transactions")
+        mockMvc.perform(post(TRANSACTIONS_ENDPOINT)
                 .contentType(APPLICATION_JSON)
                 .content(transactionJson("12.3343", TWO_MINUTES_AGO)))
                 .andExpect(status().is(NO_CONTENT.value()));
@@ -67,7 +69,7 @@ public class AT_TransactionStatistics {
 
     @Test
     public void return_400_case_json_is_invalid() throws Exception {
-        mockMvc.perform(post("/transactions")
+        mockMvc.perform(post(TRANSACTIONS_ENDPOINT)
                 .contentType(APPLICATION_JSON)
                 .content(transactionJson("", NOW)))
                 .andExpect(status().is(BAD_REQUEST.value()));
@@ -75,7 +77,7 @@ public class AT_TransactionStatistics {
 
     @Test
     public void return_400_for_malformed_json() throws Exception {
-        mockMvc.perform(post("/transactions")
+        mockMvc.perform(post(TRANSACTIONS_ENDPOINT)
                 .contentType(APPLICATION_JSON)
                 .content(malformedJson()))
                 .andExpect(status().is(BAD_REQUEST.value()));
@@ -83,7 +85,7 @@ public class AT_TransactionStatistics {
 
     @Test
     public void return_422_case_timestamp_is_in_the_future() throws Exception {
-        mockMvc.perform(post("/transactions")
+        mockMvc.perform(post(TRANSACTIONS_ENDPOINT)
                 .contentType(APPLICATION_JSON)
                 .content(transactionJson("12.3343", TOMORROW)))
                 .andExpect(status().is(UNPROCESSABLE_ENTITY.value()));
@@ -91,15 +93,18 @@ public class AT_TransactionStatistics {
 
     @Test
     public void return_statistics_for_transactions() throws Exception {
-        mockMvc.perform(post("/transactions")
+        mockMvc.perform(delete(TRANSACTIONS_ENDPOINT))
+                .andExpect(status().is(NO_CONTENT.value()));
+
+        mockMvc.perform(post(TRANSACTIONS_ENDPOINT)
                 .contentType(APPLICATION_JSON)
                 .content(transactionJson("100.0000", NOW)));
 
-        mockMvc.perform(post("/transactions")
+        mockMvc.perform(post(TRANSACTIONS_ENDPOINT)
                 .contentType(APPLICATION_JSON)
                 .content(transactionJson("50.0000", NOW)));
 
-        mockMvc.perform(get("/statistics"))
+        mockMvc.perform(get(STATISTICS_ENDPOINT))
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
                 .andExpect(jsonPath("$.sum", is(150.00)))
                 .andExpect(jsonPath("$.avg", is(75.00)))
@@ -110,10 +115,10 @@ public class AT_TransactionStatistics {
 
     @Test
     public void delete_all_transactions() throws Exception {
-        mockMvc.perform(delete("/transactions"))
+        mockMvc.perform(delete(TRANSACTIONS_ENDPOINT))
                 .andExpect(status().is(NO_CONTENT.value()));
 
-        mockMvc.perform(get("/statistics"))
+        mockMvc.perform(get(STATISTICS_ENDPOINT))
                 .andExpect(jsonPath("$.sum", is(0.00)))
                 .andExpect(jsonPath("$.avg", is(0.00)))
                 .andExpect(jsonPath("$.count", is(0)));

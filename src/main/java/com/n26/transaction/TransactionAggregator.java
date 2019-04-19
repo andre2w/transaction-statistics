@@ -27,8 +27,8 @@ class TransactionAggregator {
                 (epochSecond, transactionStatistics) -> transactionStatistics.add(transaction));
     }
 
-    void clean() {
-        throw new UnsupportedOperationException();
+    void clear() {
+        statisticsBySecond.clear();
     }
 
     private void addEmptyTransaction(long epochSecond) {
