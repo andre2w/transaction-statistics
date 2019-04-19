@@ -56,4 +56,11 @@ public class AddTransactionShould {
 
         addTransaction.execute(transactionData);
     }
+
+    @Test(expected = UnprocessableTransactionException.class)
+    public void throw_error_case_transaction_amount_is_unparseable() {
+        TransactionData transactionData = new TransactionData("ONE MILLION DOLLARS", NOW);
+
+        addTransaction.execute(transactionData);
+    }
 }

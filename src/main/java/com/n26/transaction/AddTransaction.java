@@ -28,19 +28,23 @@ public class AddTransaction {
     }
 
     private Transaction parseTransactionData(TransactionData transactionData) {
-        ZonedDateTime timestamp = parseTimestamp(transactionData);
-
-
-
-        return new Transaction(new BigDecimal(transactionData.amount()), timestamp);
+        return new Transaction(parseAmount(transactionData.amount()), parseTimestamp(transactionData.timestamp()));
     }
 
-    private ZonedDateTime parseTimestamp(TransactionData transactionData) {
+    private BigDecimal parseAmount(String amount) {
+        try {
+            return new BigDecimal(amount);
+        } catch (NumberFormatException err) {
+            throw new UnprocessableTransactionException();
+        }
+    }
+
+    private ZonedDateTime parseTimestamp(String transactionTimestamp) {
         ZonedDateTime now = clock.now();
         ZonedDateTime timestamp;
 
         try {
-            timestamp = ZonedDateTime.parse(transactionData.timestamp(), isoFormat());
+            timestamp = ZonedDateTime.parse(transactionTimestamp, isoFormat());
         } catch (DateTimeParseException err) {
             throw new UnprocessableTransactionException();
         }
