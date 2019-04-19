@@ -11,4 +11,12 @@ public class Transaction {
         this.amount = amount;
         this.timestamp = timestamp;
     }
+
+    public ZonedDateTime timestamp() {
+        return timestamp;
+    }
+
+    public boolean hasNullField() {
+        return amount == null || timestamp == null;
+    }
 }
