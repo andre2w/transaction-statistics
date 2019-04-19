@@ -31,16 +31,19 @@ public class AT_TransactionStatistics {
 
     private static final ZonedDateTime ZONED_DATE_TIME_NOW = ZonedDateTime.now(ZoneId.of("UTC"));
 
+    private static final String ISO_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
+
     private static final String NOW =
-        ZONED_DATE_TIME_NOW.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"));
+        ZONED_DATE_TIME_NOW.format(DateTimeFormatter.ofPattern(ISO_FORMAT));
 
     private static final String TWO_MINUTES_AGO =
-        ZONED_DATE_TIME_NOW.minusMinutes(2).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"));
+        ZONED_DATE_TIME_NOW.minusMinutes(2).format(DateTimeFormatter.ofPattern(ISO_FORMAT));
 
     private static final String TOMORROW =
-        ZONED_DATE_TIME_NOW.plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"));
-    public static final String TRANSACTIONS_ENDPOINT = "/transactions";
-    public static final String STATISTICS_ENDPOINT = "/statistics";
+        ZONED_DATE_TIME_NOW.plusDays(1).format(DateTimeFormatter.ofPattern(ISO_FORMAT));
+
+    private static final String TRANSACTIONS_ENDPOINT = "/transactions";
+    private static final String STATISTICS_ENDPOINT = "/statistics";
 
     @Autowired
     private GenericWebApplicationContext webApplicationContext;
@@ -106,10 +109,10 @@ public class AT_TransactionStatistics {
 
         mockMvc.perform(get(STATISTICS_ENDPOINT))
                 .andExpect(content().contentType(APPLICATION_JSON_UTF8))
-                .andExpect(jsonPath("$.sum", is(150.00)))
-                .andExpect(jsonPath("$.avg", is(75.00)))
-                .andExpect(jsonPath("$.max", is(100.00)))
-                .andExpect(jsonPath("$.min", is(50.00)))
+                .andExpect(jsonPath("$.sum", is("150.00")))
+                .andExpect(jsonPath("$.avg", is("75.00")))
+                .andExpect(jsonPath("$.max", is("100.00")))
+                .andExpect(jsonPath("$.min", is("50.00")))
                 .andExpect(jsonPath("$.count", is(2)));
     }
 
@@ -119,9 +122,21 @@ public class AT_TransactionStatistics {
                 .andExpect(status().is(NO_CONTENT.value()));
 
         mockMvc.perform(get(STATISTICS_ENDPOINT))
-                .andExpect(jsonPath("$.sum", is(0.00)))
-                .andExpect(jsonPath("$.avg", is(0.00)))
+                .andExpect(jsonPath("$.sum", is("0.00")))
+                .andExpect(jsonPath("$.avg", is("0.00")))
+                .andExpect(jsonPath("$.max", is("0.00")))
+                .andExpect(jsonPath("$.min", is("0.00")))
                 .andExpect(jsonPath("$.count", is(0)));
+    }
+
+    @Test
+    public void return_422_when_cant_parse_date() throws Exception {
+        String invalidDateFormat = ZONED_DATE_TIME_NOW.format(DateTimeFormatter.ofPattern("mm/dd/YYYY hh:MM"));
+
+        mockMvc.perform(post(TRANSACTIONS_ENDPOINT)
+                .contentType(APPLICATION_JSON)
+                .content(transactionJson("12.3343", invalidDateFormat)))
+                .andExpect(status().is(UNPROCESSABLE_ENTITY.value()));
     }
 
     private String malformedJson() {

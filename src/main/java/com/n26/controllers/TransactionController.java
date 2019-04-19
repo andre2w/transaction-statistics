@@ -1,5 +1,6 @@
 package com.n26.controllers;
 
+import com.n26.dtos.TransactionData;
 import com.n26.transaction.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,17 +23,17 @@ class TransactionController {
     }
 
     @PostMapping
-    ResponseEntity create(@RequestBody Transaction transaction) {
+    ResponseEntity create(@RequestBody TransactionData transaction) {
 
-        if (transaction.hasNullField()) {
+        if (transaction.hasEmptyField()) {
             return buildResponse(BAD_REQUEST);
         }
 
         try {
             addTransaction.execute(transaction);
-        } catch (InvalidTransactionTimestamp err) {
+        } catch (TransactionTooOldException err) {
             return buildResponse(NO_CONTENT);
-        } catch (TransactionInTheFutureException err) {
+        } catch (UnprocessableTransactionException err) {
             return buildResponse(UNPROCESSABLE_ENTITY);
         }
 

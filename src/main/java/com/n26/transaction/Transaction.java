@@ -2,23 +2,15 @@ package com.n26.transaction;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 
-public class Transaction {
+class Transaction {
     private final BigDecimal amount;
     private final ZonedDateTime timestamp;
 
-    public Transaction(BigDecimal amount, ZonedDateTime timestamp) {
+    Transaction(BigDecimal amount, ZonedDateTime timestamp) {
         this.amount = amount;
         this.timestamp = timestamp;
-    }
-
-    ZonedDateTime timestamp() {
-        return timestamp;
-    }
-
-    public boolean hasNullField() {
-        return amount == null || timestamp == null;
     }
 
     Long epochSeconds() {
@@ -29,11 +21,25 @@ public class Transaction {
         return amount;
     }
 
-    boolean isAfter(ZonedDateTime now) {
-        return timestamp().isAfter(now);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Transaction that = (Transaction) o;
+        return Objects.equals(amount, that.amount) &&
+                Objects.equals(timestamp, that.timestamp);
     }
 
-    boolean isOlderThan(ZonedDateTime now, int seconds) {
-        return ChronoUnit.SECONDS.between(timestamp(), now) > seconds;
+    @Override
+    public int hashCode() {
+        return Objects.hash(amount, timestamp);
+    }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "amount=" + amount +
+                ", timestamp=" + timestamp +
+                '}';
     }
 }

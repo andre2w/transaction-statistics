@@ -1,24 +1,28 @@
 package com.n26.controllers;
 
-import com.n26.transaction.*;
+import com.n26.dtos.TransactionData;
+import com.n26.transaction.AddTransaction;
+import com.n26.transaction.DeleteStatistics;
+import com.n26.transaction.TransactionTooOldException;
+import com.n26.transaction.UnprocessableTransactionException;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Optional;
+import java.time.format.DateTimeFormatter;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class TransactionControllerShould {
 
-    private static final ZonedDateTime NOW = ZonedDateTime.now(ZoneId.of("UTC"));
-    private static final ZonedDateTime TWO_MINUTES_AGO = NOW.minusMinutes(2);
-    private static final ZonedDateTime TOMORROW = NOW.plusDays(1);
+    private static final ZonedDateTime ZONED_DATE_TIME_NOW = ZonedDateTime.now(ZoneId.of("UTC"));
+    private static final DateTimeFormatter ISO_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+    private static final String NOW = ZONED_DATE_TIME_NOW.format(ISO_FORMAT);
+    private static final String TWO_MINUTES_AGO = ZONED_DATE_TIME_NOW.minusMinutes(2).format(ISO_FORMAT);
+    private static final String TOMORROW = ZONED_DATE_TIME_NOW.plusDays(1).format(ISO_FORMAT);;
     private static final int CREATED = 201;
     private static final int NO_CONTENT = 204;
     private static final int BAD_REQUEST = 400;
@@ -36,7 +40,7 @@ public class TransactionControllerShould {
 
     @Test
     public void return_response_with_code_201_when_transaction_is_added() {
-        Transaction transaction = new Transaction(new BigDecimal("12.30"), NOW);
+        TransactionData transaction = new TransactionData("12.30", NOW);
 
         ResponseEntity result = transactionController.create(transaction);
 
@@ -46,8 +50,8 @@ public class TransactionControllerShould {
 
     @Test
     public void return_response_with_code_204_when_transaction_is_older_than_60_seconds() {
-        Transaction transaction = new Transaction(new BigDecimal("12.30"), TWO_MINUTES_AGO);
-        doThrow(InvalidTransactionTimestamp.class).when(addTransaction).execute(transaction);
+        TransactionData transaction = new TransactionData("12.30", TWO_MINUTES_AGO);
+        doThrow(TransactionTooOldException.class).when(addTransaction).execute(transaction);
 
         ResponseEntity result = transactionController.create(transaction);
 
@@ -56,17 +60,17 @@ public class TransactionControllerShould {
 
     @Test
     public void return_response_with_code_400_when_transaction_has_invalid_field() {
-        Transaction transactionWithoutAmount = new Transaction(null, TWO_MINUTES_AGO);
+        TransactionData transactionWithoutAmount = new TransactionData(null, TWO_MINUTES_AGO);
         assertEquals(ResponseEntity.status(BAD_REQUEST).build(), transactionController.create(transactionWithoutAmount));
 
-        Transaction transactionWithoutTimestamp = new Transaction(new BigDecimal("12.30"), null);
+        TransactionData transactionWithoutTimestamp = new TransactionData("12.30", null);
         assertEquals(ResponseEntity.status(BAD_REQUEST).build(), transactionController.create(transactionWithoutTimestamp));
     }
 
     @Test
     public void return_response_with_code_422_when_transaction_happens_in_the_future() {
-        Transaction transaction = new Transaction(new BigDecimal("12.30"), TOMORROW);
-        doThrow(TransactionInTheFutureException.class).when(addTransaction).execute(transaction);
+        TransactionData transaction = new TransactionData("12.30", TOMORROW);
+        doThrow(UnprocessableTransactionException.class).when(addTransaction).execute(transaction);
 
         ResponseEntity result = transactionController.create(transaction);
 
