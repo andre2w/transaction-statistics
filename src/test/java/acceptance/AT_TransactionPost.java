@@ -1,4 +1,4 @@
-package com.n26.acceptance;
+package acceptance;
 
 import com.n26.Application;
 import org.junit.Before;
@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
 @WebAppConfiguration
-public class TransactionPost {
+public class AT_TransactionPost {
 
     public static final String NOW = ZonedDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"));
     @Autowired
