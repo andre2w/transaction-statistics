@@ -2,6 +2,7 @@ package com.n26.transaction;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 public class Transaction {
     private final BigDecimal amount;
@@ -26,5 +27,13 @@ public class Transaction {
 
     BigDecimal amount() {
         return amount;
+    }
+
+    boolean isAfter(ZonedDateTime now) {
+        return timestamp().isAfter(now);
+    }
+
+    boolean isOlderThan(ZonedDateTime now, int seconds) {
+        return ChronoUnit.SECONDS.between(timestamp(), now) > seconds;
     }
 }

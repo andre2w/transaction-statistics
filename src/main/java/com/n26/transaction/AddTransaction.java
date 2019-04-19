@@ -4,7 +4,6 @@ import com.n26.infrastructure.Clock;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 
 @Service
 public class AddTransaction {
@@ -24,11 +23,12 @@ public class AddTransaction {
 
     private void validateTransaction(Transaction transaction) {
         ZonedDateTime now = clock.now();
-        if (ChronoUnit.SECONDS.between(transaction.timestamp(), now) > 60) {
+
+        if (transaction.isOlderThan(now, 60)) {
             throw new InvalidTransactionTimestamp();
         }
 
-        if (transaction.timestamp().isAfter(now)) {
+        if (transaction.isAfter(now)) {
             throw new TransactionInTheFutureException();
         }
     }

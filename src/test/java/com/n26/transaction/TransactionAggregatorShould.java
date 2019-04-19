@@ -17,8 +17,6 @@ public class TransactionAggregatorShould {
     private static final Transaction FIRST_TRANSACTION = new Transaction(new BigDecimal("100.00"), NOW);
     private static final Transaction SECOND_TRANSACTION = new Transaction(new BigDecimal("50.00"), NOW);
 
-
-
     @Test
     public void aggregate_transaction_by_second() {
         Clock clock = mock(Clock.class);

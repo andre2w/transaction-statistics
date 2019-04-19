@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 public class RetrieveStatistics {
     private TransactionAggregator transactionAggregator;
 
-    public RetrieveStatistics(TransactionAggregator transactionAggregator) {
+    RetrieveStatistics(TransactionAggregator transactionAggregator) {
         this.transactionAggregator = transactionAggregator;
     }
 
