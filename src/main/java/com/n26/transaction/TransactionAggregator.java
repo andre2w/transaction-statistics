@@ -6,6 +6,5 @@ import org.springframework.stereotype.Service;
 class TransactionAggregator {
 
     void add(Transaction transaction) {
-        throw new UnsupportedOperationException();
     }
 }
