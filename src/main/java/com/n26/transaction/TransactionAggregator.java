@@ -13,7 +13,7 @@ class TransactionAggregator {
     private Map<Long, TransactionStatistics> statisticsBySecond = new ConcurrentHashMap<>();
     private Clock clock;
 
-    public TransactionAggregator(Clock clock) {
+    TransactionAggregator(Clock clock) {
         this.clock = clock;
     }
 
@@ -26,7 +26,7 @@ class TransactionAggregator {
                 (aLong, transactionStatistics) -> transactionStatistics.add(transaction));
     }
 
-    public TransactionStatistics statisticsOfLast(int seconds) {
+    TransactionStatistics statisticsOfLast(int seconds) {
         ZonedDateTime now = clock.now();
         TransactionStatistics transactionStatistics = TransactionStatistics.empty();
         for (int i = 0; i < seconds; i++) {

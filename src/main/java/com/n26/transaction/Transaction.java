@@ -12,7 +12,7 @@ public class Transaction {
         this.timestamp = timestamp;
     }
 
-    public ZonedDateTime timestamp() {
+    ZonedDateTime timestamp() {
         return timestamp;
     }
 
@@ -20,11 +20,11 @@ public class Transaction {
         return amount == null || timestamp == null;
     }
 
-    public Long epochSeconds() {
+    Long epochSeconds() {
         return timestamp.toEpochSecond();
     }
 
-    public BigDecimal amount() {
+    BigDecimal amount() {
         return amount;
     }
 }
