@@ -24,5 +24,4 @@ public class StatisticsControllerShould {
 
         assertEquals(ResponseEntity.ok(transactionStatistics), result);
     }
-
 }
