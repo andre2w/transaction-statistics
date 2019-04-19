@@ -20,7 +20,7 @@ public class AddTransactionShould {
     private Clock clock;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         transactionAggregator = mock(TransactionAggregator.class);
         clock = mock(Clock.class);
         addTransaction = new AddTransaction(transactionAggregator, clock);

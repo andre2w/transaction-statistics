@@ -7,7 +7,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,8 +16,11 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static org.hamcrest.Matchers.is;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @RunWith(SpringRunner.class)
@@ -49,7 +51,7 @@ public class AT_TransactionStatistics {
     @Test
     public void return_201_when_for_successful_POST_transactions() throws Exception {
         mockMvc.perform(post("/transactions")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(transactionJson("12.3343",NOW)))
                 .andExpect(status().is(HttpStatus.CREATED.value()));
     }
@@ -57,7 +59,7 @@ public class AT_TransactionStatistics {
     @Test
     public void return_204_case_transaction_is_older_than_60_seconds() throws Exception {
         mockMvc.perform(post("/transactions")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(transactionJson("12.3343", TWO_MINUTES_AGO)))
                 .andExpect(status().is(HttpStatus.NO_CONTENT.value()));
     }
@@ -65,7 +67,7 @@ public class AT_TransactionStatistics {
     @Test
     public void return_400_case_json_is_invalid() throws Exception {
         mockMvc.perform(post("/transactions")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(transactionJson("", NOW)))
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
@@ -73,7 +75,7 @@ public class AT_TransactionStatistics {
     @Test
     public void return_400_for_malformed_json() throws Exception {
         mockMvc.perform(post("/transactions")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(malformedJson()))
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
     }
@@ -81,9 +83,28 @@ public class AT_TransactionStatistics {
     @Test
     public void return_422_case_timestamp_is_in_the_future() throws Exception {
         mockMvc.perform(post("/transactions")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(transactionJson("12.3343", TOMORROW)))
                 .andExpect(status().is(HttpStatus.UNPROCESSABLE_ENTITY.value()));
+    }
+
+    @Test
+    public void return_statistics_for_transactions() throws Exception {
+        mockMvc.perform(post("/transactions")
+                .contentType(APPLICATION_JSON)
+                .content(transactionJson("100.0000", NOW)));
+
+        mockMvc.perform(post("/transactions")
+                .contentType(APPLICATION_JSON)
+                .content(transactionJson("50.0000", NOW)));
+
+        mockMvc.perform(get("/statistics"))
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(jsonPath("$.sum", is("150.00")))
+                .andExpect(jsonPath("$.avg", is("75.00")))
+                .andExpect(jsonPath("$.max", is("100.00")))
+                .andExpect(jsonPath("$.min", is("50.00")))
+                .andExpect(jsonPath("$.count", is("2")));
     }
 
     private String malformedJson() {
