@@ -111,9 +111,9 @@
                     <includes>
                         <include>**/*Should.java</include>
                         <include>**/*Test.java</include>
+                        <include>**/AT_*.java</include>
                     </includes>
                     <excludes>
-                        <exclude>**/AT_*.java</exclude>
                         <exclude>**/HttpJsonIT.java</exclude>
                     </excludes>
                 </configuration>
