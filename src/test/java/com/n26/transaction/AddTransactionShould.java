@@ -42,4 +42,11 @@ public class AddTransactionShould {
 
         addTransaction.execute(transaction);
     }
+
+    @Test(expected = TransactionInTheFutureException.class)
+    public void throw_error_case_transaction_happens_in_the_future() {
+        Transaction transaction = new Transaction(new BigDecimal("12.3343"), NOW.plusDays(2));
+
+        addTransaction.execute(transaction);
+    }
 }

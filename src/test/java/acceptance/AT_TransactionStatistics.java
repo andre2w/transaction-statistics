@@ -34,6 +34,9 @@ public class AT_TransactionStatistics {
     private static final String TWO_MINUTES_AGO =
         ZONED_DATE_TIME_NOW.minusMinutes(2).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"));
 
+    private static final String TOMORROW =
+        ZONED_DATE_TIME_NOW.plusDays(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"));
+
     @Autowired
     private GenericWebApplicationContext webApplicationContext;
     private MockMvc mockMvc;
@@ -73,6 +76,14 @@ public class AT_TransactionStatistics {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(malformedJson()))
                 .andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @Test
+    public void return_422_case_timestamp_is_in_the_future() throws Exception {
+        mockMvc.perform(post("/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(transactionJson("12.3343", TOMORROW)))
+                .andExpect(status().is(HttpStatus.UNPROCESSABLE_ENTITY.value()));
     }
 
     private String malformedJson() {
