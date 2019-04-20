@@ -14,7 +14,8 @@ import static org.mockito.Mockito.verify;
 
 public class AddTransactionShould {
 
-    public static final String TWELVE_EUROS_AND_THIRTY_CENTS = "12.3343";
+    private static final String TWELVE_EUROS_AND_THIRTY_CENTS = "12.3343";
+    private static final int SECONDS_TO_LIVE = 60;
     private TransactionAggregator transactionAggregator;
     private AddTransaction addTransaction;
 
@@ -22,7 +23,7 @@ public class AddTransactionShould {
     public void setUp() {
         transactionAggregator = mock(TransactionAggregator.class);
         Clock clock = mock(Clock.class);
-        addTransaction = new AddTransaction(transactionAggregator, clock);
+        addTransaction = new AddTransaction(transactionAggregator, clock, SECONDS_TO_LIVE);
         given(clock.now()).willReturn(ZONED_DATE_TIME_NOW);
     }
 

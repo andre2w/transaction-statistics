@@ -9,13 +9,15 @@ import static org.mockito.Mockito.mock;
 
 public class RetrieveStatisticsShould {
 
+    public static final int SECONDS_TO_LIVE = 60;
+
     @Test
     public void return_statistics_for_last_sixty_seconds() {
         TransactionStatistics transactionStatistics = aTransactionStatistics().build();
         TransactionAggregator transactionAggregator = mock(TransactionAggregator.class);
-        given(transactionAggregator.statisticsOfLast(60)).willReturn(transactionStatistics);
+        given(transactionAggregator.statisticsOfLast(SECONDS_TO_LIVE)).willReturn(transactionStatistics);
 
-        TransactionStatistics result = new RetrieveStatistics(transactionAggregator).retrieve();
+        TransactionStatistics result = new RetrieveStatistics(transactionAggregator, SECONDS_TO_LIVE).retrieve();
 
         assertEquals(transactionStatistics, result);
     }

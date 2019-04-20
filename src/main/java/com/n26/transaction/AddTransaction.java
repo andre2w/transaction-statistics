@@ -2,6 +2,7 @@ package com.n26.transaction;
 
 import com.n26.dtos.TransactionData;
 import com.n26.infrastructure.Clock;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,10 +17,13 @@ public class AddTransaction {
 
     private TransactionAggregator transactionAggregator;
     private Clock clock;
+    private int secondsToLive;
 
-    AddTransaction(TransactionAggregator transactionAggregator, Clock clock) {
+    AddTransaction(TransactionAggregator transactionAggregator, Clock clock,
+                   @Value("${secondsToLive}") int secondsToLive) {
         this.transactionAggregator = transactionAggregator;
         this.clock = clock;
+        this.secondsToLive = secondsToLive;
     }
 
     public void execute(TransactionData transactionData) {
@@ -49,7 +53,7 @@ public class AddTransaction {
             throw new UnprocessableTransactionException();
         }
 
-        if (isOlderThan(timestamp, now, 60)) {
+        if (isOlderThan(timestamp, now, secondsToLive)) {
             throw new TransactionTooOldException();
         }
 
