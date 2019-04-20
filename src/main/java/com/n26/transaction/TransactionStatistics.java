@@ -63,11 +63,11 @@ public class TransactionStatistics {
         BigDecimal newCount = new BigDecimal(count + 1);
 
         return new TransactionStatistics(
-                newSum,
-                newSum.divide(newCount, BigDecimal.ROUND_HALF_UP),
-                max.max(transaction.amount()),
-                min(transaction),
-                newCount.intValue()
+            newSum,
+            newSum.divide(newCount, ROUND_HALF_UP),
+            max.max(transaction.amount()),
+            min(transaction),
+            newCount.intValue()
         );
     }
 
