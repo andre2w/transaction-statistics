@@ -1,61 +1,43 @@
 package com.n26.transaction;
 
 import com.n26.infrastructure.Clock;
+import com.n26.infrastructure.TransactionStatisticsStore;
 import org.springframework.stereotype.Service;
 
-import java.time.ZonedDateTime;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.IntStream;
+import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 class TransactionAggregator {
 
-    private Map<Long, TransactionStatistics> statisticsBySecond = new ConcurrentHashMap<>();
+    private TransactionStatisticsStore transactionStatisticsStore;
     private Clock clock;
 
-    TransactionAggregator(Clock clock) {
+    TransactionAggregator(Clock clock, TransactionStatisticsStore transactionStatisticsStore ) {
         this.clock = clock;
+        this.transactionStatisticsStore = transactionStatisticsStore;
     }
 
     void add(Transaction transaction) {
-        if (!hasStatisticsForTimestamp(transaction.epochSeconds())) {
-            addEmptyTransaction(transaction.epochSeconds());
-        }
-
-        statisticsBySecond.computeIfPresent(transaction.epochSeconds(),
-                (epochSecond, transactionStatistics) -> transactionStatistics.add(transaction));
+        transactionStatisticsStore.add(transaction);
     }
 
     void clear() {
-        statisticsBySecond.clear();
+        transactionStatisticsStore.clear();
     }
 
-    private void addEmptyTransaction(long epochSecond) {
-        statisticsBySecond.put(epochSecond, TransactionStatistics.empty());
-    }
-
-    private boolean hasStatisticsForTimestamp(Long epochSecond) {
-        return statisticsBySecond.containsKey(epochSecond);
-    }
 
     TransactionStatistics statisticsOfLast(int seconds) {
-        ZonedDateTime now = clock.now();
-        TransactionStatistics transactionStatistics = TransactionStatistics.empty();
+        long startTime = clock.now().minusSeconds(seconds).toEpochSecond();
 
-        IntStream.range(0, seconds).forEach(
-                second -> mergeTransactions(transactionStatistics, epochSecondAt(now, second)));
+        List<TransactionStatistics> transactionStatistics = transactionStatisticsStore.statisticsFrom(startTime);
 
-        return transactionStatistics;
+        return transactionStatistics.stream()
+                .reduce(TransactionStatistics::merge)
+                .orElseGet(this::emptyTransactionStatistics);
     }
 
-    private void mergeTransactions(TransactionStatistics transactionStatistics, long epochSecond) {
-        if (hasStatisticsForTimestamp(epochSecond)) {
-            transactionStatistics.merge(statisticsBySecond.get(epochSecond));
-        }
-    }
-
-    private long epochSecondAt(ZonedDateTime now, int second) {
-        return now.minusSeconds(second).toEpochSecond();
+    private TransactionStatistics emptyTransactionStatistics() {
+        return new TransactionStatistics(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, 0);
     }
 }

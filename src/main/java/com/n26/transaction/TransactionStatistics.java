@@ -24,8 +24,13 @@ public class TransactionStatistics {
 
     private int count;
 
-    static TransactionStatistics empty() {
-        return new TransactionStatistics(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, 0);
+    public static TransactionStatistics from(Transaction transaction) {
+        return new TransactionStatistics(
+                transaction.amount(),
+                transaction.amount(),
+                transaction.amount(),
+                transaction.amount(),
+                1);
     }
 
     public TransactionStatistics() {}
@@ -58,40 +63,28 @@ public class TransactionStatistics {
         return count;
     }
 
-    TransactionStatistics add(Transaction transaction) {
+    public TransactionStatistics add(Transaction transaction) {
         BigDecimal newSum = sum.add(transaction.amount());
-        BigDecimal newCount = new BigDecimal(count + 1);
+        BigDecimal newCount = BigDecimal.valueOf(count + 1);
 
         return new TransactionStatistics(
             newSum,
             newSum.divide(newCount, ROUND_HALF_UP),
             max.max(transaction.amount()),
-            min(transaction),
-            newCount.intValue()
+            min.min(transaction.amount()),
+            newCount.intValue());
+    }
+
+    TransactionStatistics merge(TransactionStatistics transactionStatistics) {
+        int mergedCount = this.count + transactionStatistics.count;
+        BigDecimal mergedSum = sum.add(transactionStatistics.sum);
+        return new TransactionStatistics(
+            mergedSum,
+            mergedSum.divide(valueOf(mergedCount), BigDecimal.ROUND_HALF_UP),
+            max.max(transactionStatistics.max),
+            min.min(transactionStatistics.min),
+            mergedCount
         );
-    }
-
-    private BigDecimal min(Transaction transaction) {
-        if (count == 0) {
-            return transaction.amount();
-        }
-
-        return min.min(transaction.amount());
-    }
-
-    void merge(TransactionStatistics transactionStatistics) {
-        sum = sum.add(transactionStatistics.sum);
-        max = max.max(transactionStatistics.max);
-        min = minTransactionStatisticAmount(transactionStatistics);
-        count = count + transactionStatistics.count;
-        avg = sum.divide(valueOf(count), BigDecimal.ROUND_HALF_UP);
-    }
-
-    private BigDecimal minTransactionStatisticAmount(TransactionStatistics transactionStatistics) {
-        if (count == 0) {
-            return transactionStatistics.min;
-        }
-        return min.min(transactionStatistics.min);
     }
 
     @Override

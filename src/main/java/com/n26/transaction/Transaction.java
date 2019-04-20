@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
-class Transaction {
+public class Transaction {
     private final BigDecimal amount;
     private final ZonedDateTime timestamp;
 
@@ -13,7 +13,7 @@ class Transaction {
         this.timestamp = timestamp;
     }
 
-    Long epochSeconds() {
+    public Long epochSeconds() {
         return timestamp.toEpochSecond();
     }
 

@@ -1,6 +1,7 @@
 package com.n26.transaction;
 
 import com.n26.infrastructure.Clock;
+import com.n26.infrastructure.TransactionStatisticsStore;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,11 +43,14 @@ public class TransactionAggregatorShould {
                     .withCount(1)
                     .build();
 
+    private static final TransactionStatistics emptyTransactionStatistics = aTransactionStatistics().build();
+
 
     @Before
     public void setUp() {
         clock = mock(Clock.class);
-        transactionAggregator = new TransactionAggregator(clock);
+        TransactionStatisticsStore transactionStatisticsStore = new TransactionStatisticsStore();
+        transactionAggregator = new TransactionAggregator(clock, transactionStatisticsStore);
     }
 
     @Test
@@ -93,6 +97,7 @@ public class TransactionAggregatorShould {
 
         transactionAggregator.clear();
 
-        assertEquals(TransactionStatistics.empty(), transactionAggregator.statisticsOfLast(60));
+
+        assertEquals(emptyTransactionStatistics, transactionAggregator.statisticsOfLast(60));
     }
 }
