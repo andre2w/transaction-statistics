@@ -9,20 +9,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-
+import static com.n26.fixtures.TimeFixtures.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class TransactionControllerShould {
 
-    private static final ZonedDateTime ZONED_DATE_TIME_NOW = ZonedDateTime.now(ZoneId.of("UTC"));
-    private static final DateTimeFormatter ISO_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
-    private static final String NOW = ZONED_DATE_TIME_NOW.format(ISO_FORMAT);
-    private static final String TWO_MINUTES_AGO = ZONED_DATE_TIME_NOW.minusMinutes(2).format(ISO_FORMAT);
-    private static final String TOMORROW = ZONED_DATE_TIME_NOW.plusDays(1).format(ISO_FORMAT);;
     private static final int CREATED = 201;
     private static final int NO_CONTENT = 204;
     private static final int BAD_REQUEST = 400;
