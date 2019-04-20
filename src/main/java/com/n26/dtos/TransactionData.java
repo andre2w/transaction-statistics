@@ -17,7 +17,7 @@ public class TransactionData {
         return timestamp;
     }
 
-    public boolean hasEmptyField() {
+    public boolean hasInvalidField() {
         if (amount != null && timestamp != null) {
             return amount.isEmpty() || timestamp.isEmpty();
         }

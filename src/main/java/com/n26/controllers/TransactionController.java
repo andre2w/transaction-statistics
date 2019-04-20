@@ -25,7 +25,7 @@ class TransactionController {
     @PostMapping
     ResponseEntity create(@RequestBody TransactionData transaction) {
 
-        if (transaction.hasEmptyField()) {
+        if (transaction.hasInvalidField()) {
             return buildResponse(BAD_REQUEST);
         }
 

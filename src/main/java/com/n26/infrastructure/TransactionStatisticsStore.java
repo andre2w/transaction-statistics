@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
+import static java.util.stream.Collectors.reducing;
 import static java.util.stream.Collectors.toList;
 
 @Component
@@ -33,6 +34,10 @@ public class TransactionStatisticsStore {
                 .filter(isNewThan(startSecond))
                 .map(Map.Entry::getValue)
                 .collect(toList());
+    }
+
+    public int size() {
+        return statisticsBySecond.size();
     }
 
     private TransactionStatistics addTransaction(Transaction transaction, TransactionStatistics transactionStatistics) {

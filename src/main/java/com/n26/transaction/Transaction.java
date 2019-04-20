@@ -8,7 +8,7 @@ public class Transaction {
     private final BigDecimal amount;
     private final ZonedDateTime timestamp;
 
-    Transaction(BigDecimal amount, ZonedDateTime timestamp) {
+    public Transaction(BigDecimal amount, ZonedDateTime timestamp) {
         this.amount = amount;
         this.timestamp = timestamp;
     }
