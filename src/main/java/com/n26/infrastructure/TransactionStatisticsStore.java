@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
-import static java.util.stream.Collectors.reducing;
 import static java.util.stream.Collectors.toList;
 
 @Component
@@ -49,5 +48,11 @@ public class TransactionStatisticsStore {
 
     private Predicate<Map.Entry<Long, TransactionStatistics>> isNewThan(long startSecond) {
         return entry -> entry.getKey() > startSecond;
+    }
+
+    void deleteStatisticsBefore(long epochSecond) {
+        statisticsBySecond.keySet().stream()
+                .filter(key -> key <= epochSecond)
+                .forEach(statisticsBySecond::remove);
     }
 }
