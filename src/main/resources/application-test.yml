@@ -1,1 +1,2 @@
-secondsToLive: 1
+secondsToLive: 5
+cleanupInMilliseconds: 6000

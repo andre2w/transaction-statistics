@@ -17,7 +17,7 @@ class CleanupScheduler {
         this.secondsToLive = secondsToLive;
     }
 
-    @Scheduled(fixedRateString = "${secondsToLive}")
+    @Scheduled(fixedRateString = "${cleanupInMilliseconds}")
     void execute() {
         long epochSecond = clock.now().minusSeconds(secondsToLive).toEpochSecond();
         transactionStatisticsStore.deleteStatisticsBefore(epochSecond);
