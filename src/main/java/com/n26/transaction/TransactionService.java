@@ -74,4 +74,8 @@ public class TransactionService {
     public void deleteAll() {
         transactionAggregator.clear();
     }
+
+    public TransactionStatistics statistics() {
+        return transactionAggregator.statisticsOfLast(secondsToLive);
+    }
 }

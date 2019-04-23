@@ -7,7 +7,9 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 
+import static com.n26.builders.TransactionStatisticsBuilder.aTransactionStatistics;
 import static com.n26.fixtures.TimeFixtures.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -62,5 +64,15 @@ public class TransactionServiceShould {
         transactionService.deleteAll();
 
         verify(transactionAggregator).clear();
+    }
+
+    @Test
+    public void return_statistics_for_last_sixty_seconds() {
+        TransactionStatistics transactionStatistics = aTransactionStatistics().build();
+        given(transactionAggregator.statisticsOfLast(SECONDS_TO_LIVE)).willReturn(transactionStatistics);
+
+        TransactionStatistics result = transactionService.statistics();
+
+        assertEquals(transactionStatistics, result);
     }
 }

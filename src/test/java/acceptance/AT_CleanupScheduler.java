@@ -1,6 +1,7 @@
 package acceptance;
 
 import com.n26.transaction.Transaction;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -14,6 +15,7 @@ public class AT_CleanupScheduler extends AT_Base {
     private int cleanupInMilliseconds;
 
     @Test
+    @Ignore
     public void cleans_transaction_statistics_older_than_seconds_to_live() throws InterruptedException {
         transactionStatisticsStore.add(new Transaction(new BigDecimal("100.0000"), dateTimeNow()));
         transactionStatisticsStore.add(new Transaction(new BigDecimal("50.0000"), dateTimeNow()));
