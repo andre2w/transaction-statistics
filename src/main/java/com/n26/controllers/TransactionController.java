@@ -15,11 +15,9 @@ import static org.springframework.http.HttpStatus.*;
 class TransactionController {
 
     private TransactionService transactionService;
-    private DeleteStatistics deleteStatistics;
 
-    TransactionController(TransactionService transactionService, DeleteStatistics deleteStatistics) {
+    TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
-        this.deleteStatistics = deleteStatistics;
     }
 
     @PostMapping
@@ -42,7 +40,7 @@ class TransactionController {
 
     @DeleteMapping
     ResponseEntity delete() {
-        deleteStatistics.execute();
+        transactionService.deleteAll();
         return buildResponse(NO_CONTENT);
     }
 

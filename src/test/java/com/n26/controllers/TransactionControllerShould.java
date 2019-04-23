@@ -17,14 +17,12 @@ public class TransactionControllerShould {
     private static final int BAD_REQUEST = 400;
     private static final int UNPROCESSABLE_ENTITY = 422;
     private TransactionController transactionController;
-    private DeleteStatistics deleteStatistics;
     private TransactionService transactionService;
 
     @Before
     public void setUp() {
-        deleteStatistics = mock(DeleteStatistics.class);
         transactionService = mock(TransactionService.class);
-        transactionController = new TransactionController(transactionService, deleteStatistics);
+        transactionController = new TransactionController(transactionService);
     }
 
     @Test
@@ -70,7 +68,7 @@ public class TransactionControllerShould {
     public void delete_stored_transaction_statistics() {
         ResponseEntity result = transactionController.delete();
 
-        verify(deleteStatistics).execute();
+        verify(transactionService).deleteAll();
         assertEquals(ResponseEntity.status(NO_CONTENT).build(), result);
     }
 }

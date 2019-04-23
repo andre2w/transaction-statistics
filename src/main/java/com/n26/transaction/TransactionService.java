@@ -70,4 +70,8 @@ public class TransactionService {
     private boolean isOlderThan(ZonedDateTime timestamp, ZonedDateTime now, int seconds) {
         return ChronoUnit.SECONDS.between(timestamp, now) >= seconds;
     }
+
+    public void deleteAll() {
+        transactionAggregator.clear();
+    }
 }

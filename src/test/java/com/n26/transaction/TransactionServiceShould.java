@@ -57,4 +57,10 @@ public class TransactionServiceShould {
         transactionService.add(transactionData);
     }
 
+    @Test
+    public void delete_stored_statistics_from_aggregator() {
+        transactionService.deleteAll();
+
+        verify(transactionAggregator).clear();
+    }
 }
