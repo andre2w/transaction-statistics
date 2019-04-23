@@ -225,3 +225,11 @@ pickle-email-*.html
 
 # Ignore node_modules
 node_modules/
+
+# Ignore IDE files
+.classpath
+.factorypath
+.project
+*.iml
+.idea/
+.settings/

@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
+
+import static com.n26.infrastructure.Clock.ISO_FORMAT;
 
 @Service
 public class TransactionService {
@@ -30,6 +30,14 @@ public class TransactionService {
         transactionAggregator.add(transaction);
     }
 
+    public TransactionStatistics statistics() {
+        return transactionAggregator.statisticsOfLast(secondsToLive);
+    }
+
+    public void deleteAll() {
+        transactionAggregator.clear();
+    }
+
     private Transaction parseTransactionData(TransactionData transactionData) {
         return new Transaction(parseAmount(transactionData.amount()), parseTimestamp(transactionData.timestamp()));
     }
@@ -47,7 +55,7 @@ public class TransactionService {
         ZonedDateTime timestamp;
 
         try {
-            timestamp = ZonedDateTime.parse(transactionTimestamp, isoFormat());
+            timestamp = ZonedDateTime.parse(transactionTimestamp, ISO_FORMAT);
         } catch (DateTimeParseException err) {
             throw new UnprocessableTransactionException();
         }
@@ -63,19 +71,7 @@ public class TransactionService {
         return timestamp;
     }
 
-    private DateTimeFormatter isoFormat() {
-        return DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX").withZone(ZoneId.of("UTC"));
-    }
-
     private boolean isOlderThan(ZonedDateTime timestamp, ZonedDateTime now, int seconds) {
         return ChronoUnit.SECONDS.between(timestamp, now) >= seconds;
-    }
-
-    public void deleteAll() {
-        transactionAggregator.clear();
-    }
-
-    public TransactionStatistics statistics() {
-        return transactionAggregator.statisticsOfLast(secondsToLive);
     }
 }
