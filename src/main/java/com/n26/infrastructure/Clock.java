@@ -16,4 +16,7 @@ public class Clock {
         return  ZonedDateTime.now(ZoneId.of("UTC"));
     }
 
+    public ZonedDateTime parse(String dateTime) {
+        return null;
+    }
 }
