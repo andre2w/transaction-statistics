@@ -14,23 +14,23 @@ import static org.springframework.http.HttpStatus.*;
 @RestController
 class TransactionController {
 
-    private AddTransaction addTransaction;
+    private TransactionService transactionService;
     private DeleteStatistics deleteStatistics;
 
-    TransactionController(AddTransaction addTransaction, DeleteStatistics deleteStatistics) {
-        this.addTransaction = addTransaction;
+    TransactionController(TransactionService transactionService, DeleteStatistics deleteStatistics) {
+        this.transactionService = transactionService;
         this.deleteStatistics = deleteStatistics;
     }
 
     @PostMapping
-    ResponseEntity create(@RequestBody TransactionData transaction) {
+    ResponseEntity create(@RequestBody TransactionData transactionData) {
 
-        if (transaction.hasInvalidField()) {
+        if (transactionData.hasInvalidField()) {
             return buildResponse(BAD_REQUEST);
         }
 
         try {
-            addTransaction.execute(transaction);
+            transactionService.add(transactionData);
         } catch (TransactionTooOldException err) {
             return buildResponse(NO_CONTENT);
         } catch (UnprocessableTransactionException err) {

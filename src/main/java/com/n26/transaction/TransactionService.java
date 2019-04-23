@@ -13,20 +13,19 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 
 @Service
-public class AddTransaction {
-
+public class TransactionService {
     private TransactionAggregator transactionAggregator;
     private Clock clock;
     private int secondsToLive;
 
-    AddTransaction(TransactionAggregator transactionAggregator, Clock clock,
-                   @Value("${secondsToLive}") int secondsToLive) {
+    public TransactionService(TransactionAggregator transactionAggregator, Clock clock,
+                              @Value("${secondsToLive}") int secondsToLive) {
         this.transactionAggregator = transactionAggregator;
         this.clock = clock;
         this.secondsToLive = secondsToLive;
     }
 
-    public void execute(TransactionData transactionData) {
+    public void add(TransactionData transactionData) {
         Transaction transaction = parseTransactionData(transactionData);
         transactionAggregator.add(transaction);
     }
