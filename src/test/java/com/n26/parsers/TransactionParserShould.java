@@ -3,6 +3,7 @@ package com.n26.parsers;
 import com.n26.dtos.TransactionData;
 import com.n26.infrastructure.Clock;
 import com.n26.transaction.Transaction;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -18,12 +19,19 @@ import static org.mockito.Mockito.mock;
 
 public class TransactionParserShould {
 
+    private Clock clock;
+    private TransactionParser transactionParser;
+
+    @Before
+    public void setUp() {
+        clock = mock(Clock.class);
+        transactionParser = new TransactionParser(clock);
+    }
+
     @Test
     public void parse_transaction_data_into_transaction_object() {
         TransactionData transactionData = new TransactionData("12.500", NOW);
-        Clock clock = mock(Clock.class);
         given(clock.parse(NOW)).willReturn(ZONED_DATE_TIME_NOW);
-        TransactionParser transactionParser = new TransactionParser(clock);
 
         Optional<Transaction> result = transactionParser.parse(transactionData);
 
@@ -34,9 +42,6 @@ public class TransactionParserShould {
     @Test
     public void return_empty_optional_when_fails_to_parse_amount() {
         TransactionData transactionData = new TransactionData("", NOW);
-        Clock clock = mock(Clock.class);
-        given(clock.parse(NOW)).willReturn(ZONED_DATE_TIME_NOW);
-        TransactionParser transactionParser = new TransactionParser(clock);
 
         Optional<Transaction> result = transactionParser.parse(transactionData);
 
@@ -46,9 +51,7 @@ public class TransactionParserShould {
     @Test
     public void return_empty_optional_when_fails_to_parse_timestamp() {
         TransactionData transactionData = new TransactionData("12.500", "Mar/31/2018 11:13:43");
-        Clock clock = mock(Clock.class);
         given(clock.parse("Mar/31/2018 11:13:43")).willThrow(DateTimeParseException.class);
-        TransactionParser transactionParser = new TransactionParser(clock);
 
         Optional<Transaction> result = transactionParser.parse(transactionData);
 
