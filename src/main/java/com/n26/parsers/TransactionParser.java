@@ -6,6 +6,7 @@ import com.n26.transaction.Transaction;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
 class TransactionParser {
@@ -17,13 +18,20 @@ class TransactionParser {
 
     Optional<Transaction> parse(TransactionData transactionData) {
         BigDecimal amount;
+        ZonedDateTime timestamp;
+
         try {
             amount = new BigDecimal(transactionData.amount());
         } catch (NumberFormatException err) {
             return Optional.empty();
         }
 
-        ZonedDateTime timestamp = clock.parse(transactionData.timestamp());
+        try {
+            timestamp = clock.parse(transactionData.timestamp());
+        } catch (DateTimeParseException err) {
+            return Optional.empty();
+        }
+
         return Optional.of(new Transaction(amount, timestamp));
     }
 }
