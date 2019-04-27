@@ -8,15 +8,21 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
-public class TransactionParser {
+class TransactionParser {
     private Clock clock;
 
-    public TransactionParser(Clock clock) {
+    TransactionParser(Clock clock) {
         this.clock = clock;
     }
 
-    public Optional<Transaction> parse(TransactionData transactionData) {
-        BigDecimal amount = new BigDecimal(transactionData.amount());
+    Optional<Transaction> parse(TransactionData transactionData) {
+        BigDecimal amount;
+        try {
+            amount = new BigDecimal(transactionData.amount());
+        } catch (NumberFormatException err) {
+            return Optional.empty();
+        }
+
         ZonedDateTime timestamp = clock.parse(transactionData.timestamp());
         return Optional.of(new Transaction(amount, timestamp));
     }
