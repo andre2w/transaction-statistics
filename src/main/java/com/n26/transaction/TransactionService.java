@@ -25,8 +25,8 @@ public class TransactionService {
         this.secondsToLive = secondsToLive;
     }
 
-    public void add(TransactionData transactionData) {
-        Transaction transaction = parseTransactionData(transactionData);
+    public void add(Transaction transaction) {
+        validateTimestamp(transaction.timestamp());
         transactionAggregator.add(transaction);
     }
 
@@ -38,27 +38,9 @@ public class TransactionService {
         transactionAggregator.clear();
     }
 
-    private Transaction parseTransactionData(TransactionData transactionData) {
-        return new Transaction(parseAmount(transactionData.amount()), parseTimestamp(transactionData.timestamp()));
-    }
 
-    private BigDecimal parseAmount(String amount) {
-        try {
-            return new BigDecimal(amount);
-        } catch (NumberFormatException err) {
-            throw new UnprocessableTransactionException();
-        }
-    }
-
-    private ZonedDateTime parseTimestamp(String transactionTimestamp) {
+    private void validateTimestamp(ZonedDateTime timestamp) {
         ZonedDateTime now = clock.now();
-        ZonedDateTime timestamp;
-
-        try {
-            timestamp = ZonedDateTime.parse(transactionTimestamp, ISO_FORMAT);
-        } catch (DateTimeParseException err) {
-            throw new UnprocessableTransactionException();
-        }
 
         if (isOlderThan(timestamp, now, secondsToLive)) {
             throw new TransactionTooOldException();
@@ -67,8 +49,6 @@ public class TransactionService {
         if (timestamp.isAfter(now)) {
             throw new UnprocessableTransactionException();
         }
-
-        return timestamp;
     }
 
     private boolean isOlderThan(ZonedDateTime timestamp, ZonedDateTime now, int seconds) {

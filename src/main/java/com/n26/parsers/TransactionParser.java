@@ -3,20 +3,22 @@ package com.n26.parsers;
 import com.n26.dtos.TransactionData;
 import com.n26.infrastructure.Clock;
 import com.n26.transaction.Transaction;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
-class TransactionParser {
+@Component
+public class TransactionParser {
     private Clock clock;
 
-    TransactionParser(Clock clock) {
+    public TransactionParser(Clock clock) {
         this.clock = clock;
     }
 
-    Optional<Transaction> parse(TransactionData transactionData) {
+    public Optional<Transaction> parse(TransactionData transactionData) {
         BigDecimal amount;
         ZonedDateTime timestamp;
 

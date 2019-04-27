@@ -17,6 +17,6 @@ public class Clock {
     }
 
     public ZonedDateTime parse(String dateTime) {
-        return null;
+        return ZonedDateTime.parse(dateTime, ISO_FORMAT);
     }
 }

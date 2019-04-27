@@ -13,6 +13,10 @@ public class Transaction {
         this.timestamp = timestamp;
     }
 
+    public ZonedDateTime timestamp() {
+        return timestamp;
+    }
+
     public Long epochSeconds() {
         return timestamp.toEpochSecond();
     }
